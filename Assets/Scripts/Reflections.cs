@@ -1,19 +1,44 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Reflections : MonoBehaviour
 {
-    [SerializeField] Transform LaserShooter;
-    [SerializeField] float RayDistance = 5.0f;
+    // Reflected vector
+    // r = d-2(d dot normal) * normal 
+
+    [SerializeField] int numBounces = 2;
     void OnDrawGizmos()
     {
-        RaycastHit hit;
+        var transform1 = transform;
+        Vector2 origin = transform1.position;
+        Vector2 dir = transform1.right;
+        
+        Ray ray = new Ray(origin, dir);
+        
+        Gizmos.DrawLine(origin, origin + dir);
 
-        if (Physics.Raycast(LaserShooter.position, LaserShooter.forward, out hit, Mathf.Infinity))
+        for (int i = 0; i < numBounces; i++)
         {
-            Debug.DrawLine(LaserShooter.position, LaserShooter.forward * RayDistance, Color.red);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                Gizmos.DrawSphere(hit.point, 0.1f);
+                var placeholder = hit.normal;
+
+                Vector2 reflected = Reflect(ray.direction, hit.normal);
+                Gizmos.color = Color.blue;
+                Gizmos.DrawLine(hit.point, (Vector2)hit.point + reflected);
+
+
+                ray.direction = reflected;
+                ray.origin = hit.point;
+                // Built in
+                // Vector2.Reflect();
+            }
         }
+    }
+
+    Vector2 Reflect(Vector2 inDir, Vector2 normal)
+    {
+        float proj = Vector2.Dot(inDir, normal);
+        return inDir - 2 * proj * normal;
     }
 }

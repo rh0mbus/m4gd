@@ -1,15 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CustomTrigger : MonoBehaviour
 {
     [SerializeField] bool isActive = true;
-    [SerializeField] Transform A;
-    [SerializeField] Transform B;
+    [SerializeField] Transform objectATransform;
+    [SerializeField] Transform objectB;
     
-    [SerializeField] float TriggerRange = 4.0f;
+    [SerializeField] float triggerRange = 4.0f;
     void OnDrawGizmos()
     {
         if (isActive)
@@ -20,11 +17,11 @@ public class CustomTrigger : MonoBehaviour
 
     void PerformCalculations()
     {
-        Vector2 a = A.position;
-        Vector2 b = B.position;
+        Vector2 a = objectATransform.position;
+        Vector2 b = objectB.position;
 
         Gizmos.color = new Color(255, 155, 0);
-        Gizmos.DrawWireSphere(B.position, TriggerRange);
+        Gizmos.DrawWireSphere(b, triggerRange);
         
         // A
         Gizmos.color = Color.red;
@@ -44,13 +41,19 @@ public class CustomTrigger : MonoBehaviour
         Gizmos.DrawLine(default, b);
 
         var difference2D = a + (-b);
-        var mag = Math.Sqrt(difference2D.x * difference2D.x + difference2D.y * difference2D.y);
-
+        var sqrDistance = difference2D.x * difference2D.x + difference2D.y * difference2D.y;
         Debug.Log($"Vector difference: {difference2D}");
         Debug.Log($"Unity magnitude: {difference2D.magnitude}");
-        Debug.Log($"Calculated magnitude: {mag}");
+        
+        // var mag = Math.Sqrt(difference2D.x * difference2D.x + difference2D.y * difference2D.y);
+        // Debug.Log($"Calculated magnitude: {mag}");
 
-        if (mag <= TriggerRange)
+        // if (mag <= triggerRange)
+        // {
+        //     Debug.LogWarning("Boom!");
+        // }
+
+        if (sqrDistance <= (triggerRange * triggerRange))
         {
             Debug.LogWarning("Boom!");
         }
